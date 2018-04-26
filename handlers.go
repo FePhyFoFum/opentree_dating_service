@@ -10,10 +10,14 @@ import (
 
 //Index wasted index function
 func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Welcome!\n")
+	fmt.Fprint(w, "Open Tree Dating Service\n")
 }
 
-//InduceSubtree get induced subtree
+func Emot(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, GetEmot())
+}
+
+//InduceSubtre get induced subtree
 //curl -X POST http://localhost:8080/induce_subtree -H "content-type:application/json" -d '{"ott_ids":[292466, 267845, 666104, 316878, 102710]}'
 func InduceSubtree(w http.ResponseWriter, r *http.Request) {
 	var query Query

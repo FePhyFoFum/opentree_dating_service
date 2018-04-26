@@ -21,6 +21,12 @@ var routes = Routes{
 		Index,
 	},
 	Route{
+		"Emot",
+		"GET",
+		"/emot",
+		Emot,
+	},
+	Route{
 		"InduceSubtree",
 		"POST",
 		"/induce_subtree",
