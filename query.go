@@ -8,4 +8,5 @@ type Query struct {
 // Newick return newick string json
 type Newick struct {
 	NewString string `json:"newick"`
+	Unmatched []int  `json:"unmatched_ott_ids"`
 }

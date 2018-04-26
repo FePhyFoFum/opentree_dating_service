@@ -58,13 +58,17 @@ func init() {
 //GetInducedTree make the induced tree and return the newick string
 func GetInducedTree(ids []int) Newick {
 	nds := make([]*Node, 0)
+	unmatched := make([]int, 0)
 	for _, i := range ids {
 		if _, ok := namedNodeMap[i]; ok {
 			nds = append(nds, namedNodeMap[i])
+		} else {
+			unmatched = append(unmatched, i)
 		}
 	}
 	traceTree(nds)
 	var n Newick
+	n.Unmatched = unmatched
 	x := tree.Rt.NewickPaint(true) + ";"
 	n.NewString = x
 	untraceTree(nds)
