@@ -218,16 +218,16 @@ func GetRenamedTree(newickin string) Newick {
 
 func prettifyName(ins string) string {
 	x := ins
-	strings.Replace(x, "\"", "", 0)
-	strings.Replace(x, "'", "", 0)
-	strings.Replace(x, ";", "", 0)
-	strings.Replace(x, "(", "", 0)
-	strings.Replace(x, ")", "", 0)
-	strings.Replace(x, ":", "", 0)
-	strings.Replace(x, ",", "", 0)
-	strings.Replace(x, " ", "_", 0)
-	strings.Replace(x, "[", "", 0)
-	strings.Replace(x, "]", "", 0)
-	strings.Replace(x, "&", "", 0)
+	x = strings.Replace(x, "\"", "", -1)
+	x = strings.Replace(x, "'", "", -1)
+	x = strings.Replace(x, ";", "", -1)
+	x = strings.Replace(x, "(", "", -1)
+	x = strings.Replace(x, ")", "", -1)
+	x = strings.Replace(x, ":", "", -1)
+	x = strings.Replace(x, ",", "", -1)
+	x = strings.Replace(x, " ", "_", -1)
+	x = strings.Replace(x, "[", "", -1)
+	x = strings.Replace(x, "]", "", -1)
+	x = strings.Replace(x, "&", "", -1)
 	return x
 }
