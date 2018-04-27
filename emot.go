@@ -420,6 +420,7 @@ var emots = [...]string{"(૭ ◉༬◉)૭⁾⁾⁾⁾",
 	"⋆ᶿ̵᷄ ˒̼ ᶿ̵᷅⋆",
 	"ʕ ͠° ʖ̫ °͠ ʔ"}
 
+//GetEmot get emoticon
 func GetEmot() string {
 	rand.Seed(time.Now().Unix())
 	return emots[rand.Intn(len(emots))]

@@ -29,7 +29,7 @@ var routes = Routes{
 	Route{
 		"InduceSubtree",
 		"POST",
-		"/induce_subtree",
-		InduceSubtree,
+		"/induced_subtree",
+		InducedSubtree,
 	},
 }

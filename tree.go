@@ -10,6 +10,7 @@ type Tree struct {
 	Index int // if there is an identifying index
 }
 
+//NewTree get new tree
 func NewTree() *Tree {
 	return &Tree{}
 }

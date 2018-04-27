@@ -67,12 +67,69 @@ func GetInducedTree(ids []int) Newick {
 		}
 	}
 	traceTree(nds)
+	addLen := make(map[string]float64)
+	for _, i := range nds {
+		if len(i.Chs) > 0 {
+			if len(getMarkedChs(i)) == 0 {
+				addLen[i.Nam] = getSubTendLen(i)
+			}
+		}
+	}
 	var n Newick
 	n.Unmatched = unmatched
-	x := tree.Rt.NewickPaint(true) + ";"
+	curRt := tree.Rt
+	going := true
+	for going {
+		x := getMarkedChs(curRt)
+		if len(x) == 1 {
+			curRt = x[0]
+		} else {
+			going = false
+			break
+		}
+	}
+	x := curRt.NewickPaint(true) + ";"
+	//handle the tips thjat are not tips
+	//this takes time but necessary
+	nt := ReadNewickString(x)
+	var ntt Tree
+	ntt.Instantiate(nt)
+	for _, i := range ntt.Tips {
+		if _, ok := addLen[i.Nam]; ok {
+			i.Len += addLen[i.Nam]
+		}
+	}
+	x = nt.Newick(true) + ";"
+	//end the handle
 	n.NewString = x
 	untraceTree(nds)
 	return n
+}
+
+func getSubTendLen(nd *Node) float64 {
+	x := 0.0
+	going := true
+	curNd := nd.Chs[0]
+	for going {
+		x += curNd.Len
+		if len(curNd.Chs) > 0 {
+			curNd = curNd.Chs[0]
+		} else {
+			going = false
+			break
+		}
+	}
+	return x
+}
+
+func getMarkedChs(nd *Node) []*Node {
+	x := make([]*Node, 0)
+	for _, i := range nd.Chs {
+		if i.Marked {
+			x = append(x, i)
+		}
+	}
+	return x
 }
 
 func traceTree(nds []*Node) {

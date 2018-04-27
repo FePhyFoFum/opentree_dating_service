@@ -13,13 +13,14 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "Open Tree Dating Service\n")
 }
 
+//Emot funny
 func Emot(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, GetEmot())
 }
 
-//InduceSubtre get induced subtree
-//curl -X POST http://localhost:8080/induce_subtree -H "content-type:application/json" -d '{"ott_ids":[292466, 267845, 666104, 316878, 102710]}'
-func InduceSubtree(w http.ResponseWriter, r *http.Request) {
+//InducedSubtree get induced subtree
+//curl -X POST http://localhost:8080/induced_subtree -H "content-type:application/json" -d '{"ott_ids":[292466, 267845, 666104, 316878, 102710]}'
+func InducedSubtree(w http.ResponseWriter, r *http.Request) {
 	var query Query
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
