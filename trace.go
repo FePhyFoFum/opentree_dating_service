@@ -6,12 +6,14 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var tree Tree
 var namedNodeMap map[int]*Node
+var ottidNameMap map[string]string
 
-// Give us some seed data
+// Run at the start of the server
 func init() {
 	tfn := "labelled_supertree.dated.tiplen.tre"
 	//read a tree file
@@ -52,6 +54,30 @@ func init() {
 			}
 		}
 	}
+	fmt.Println("finished tree processing")
+	//end the tree tracing information
+	//start the taxonomy information
+	tfn = "taxonomy.tsv"
+	f, err = os.Open(tfn)
+	defer f.Close()
+	scanner = bufio.NewReader(f)
+	ottidNameMap = make(map[string]string)
+	for {
+		ln, err := scanner.ReadString('\n')
+		if len(ln) > 0 {
+			s := strings.Split(ln, "\t|\t")
+			ottidNameMap[s[0]] = prettifyName(s[2])
+		}
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+	}
+	fmt.Println("finished tax processing")
+	//end the taxonomy information
 	fmt.Println("finished init")
 }
 
@@ -166,4 +192,42 @@ func untraceTree(nds []*Node) {
 			cur = cur.Par
 		}
 	}
+}
+
+//GetRenamedTree innewick with ottids and out newick with ottids
+func GetRenamedTree(newickin string) Newick {
+	var renew Newick
+	t := ReadNewickString(newickin)
+	var intree Tree
+	intree.Instantiate(t)
+	for _, i := range intree.Post {
+		if len(i.Nam) == 0 {
+			continue
+		}
+		mn := i.Nam
+		if i.Nam[:3] == "ott" {
+			mn = i.Nam[3:]
+		}
+		if _, ok := ottidNameMap[mn]; ok {
+			i.Nam = ottidNameMap[mn]
+		}
+	}
+	renew.NewString = intree.Rt.Newick(true) + ";"
+	return renew
+}
+
+func prettifyName(ins string) string {
+	x := ins
+	strings.Replace(x, "\"", "", 0)
+	strings.Replace(x, "'", "", 0)
+	strings.Replace(x, ";", "", 0)
+	strings.Replace(x, "(", "", 0)
+	strings.Replace(x, ")", "", 0)
+	strings.Replace(x, ":", "", 0)
+	strings.Replace(x, ",", "", 0)
+	strings.Replace(x, " ", "_", 0)
+	strings.Replace(x, "[", "", 0)
+	strings.Replace(x, "]", "", 0)
+	strings.Replace(x, "&", "", 0)
+	return x
 }

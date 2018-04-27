@@ -10,3 +10,8 @@ type Newick struct {
 	NewString string `json:"newick"`
 	Unmatched []int  `json:"unmatched_ott_ids"`
 }
+
+// NewickQuery in newick query
+type NewickQuery struct {
+	NewIn string `json:"newick"`
+}

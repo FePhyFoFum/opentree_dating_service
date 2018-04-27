@@ -27,9 +27,15 @@ var routes = Routes{
 		Emot,
 	},
 	Route{
-		"InduceSubtree",
+		"InducedSubtree",
 		"POST",
 		"/induced_subtree",
 		InducedSubtree,
+	},
+	Route{
+		"RenameTree",
+		"POST",
+		"/rename_tree",
+		RenameTree,
 	},
 }
