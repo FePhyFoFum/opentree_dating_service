@@ -12,6 +12,7 @@ import (
 var tree Tree
 var namedNodeMap map[int]*Node
 var ottidNameMap map[string]string
+var ncbiNameMap map[string]string
 
 // Run at the start of the server
 func init() {
@@ -78,6 +79,31 @@ func init() {
 	}
 	fmt.Println("finished tax processing")
 	//end the taxonomy information
+	//start ncbi taxonomy processing
+	tfn = "names.dmp"
+	f, err = os.Open(tfn)
+	defer f.Close()
+	scanner = bufio.NewReader(f)
+	ncbiNameMap = make(map[string]string)
+	for {
+		ln, err := scanner.ReadString('\n')
+		if len(ln) > 0 {
+			s := strings.Split(ln, "\t|\t")
+			if s[3] == "scientific name\t|\n" {
+				ncbiNameMap[s[0]] = prettifyName(s[1])
+			}
+		}
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+	}
+	fmt.Println("finished tax (ncbi) processing")
+	//end ncbi taxonomy processing
+
 	fmt.Println("finished init")
 }
 
@@ -210,6 +236,25 @@ func GetRenamedTree(newickin string) Newick {
 		}
 		if _, ok := ottidNameMap[mn]; ok {
 			i.Nam = ottidNameMap[mn]
+		}
+	}
+	renew.NewString = intree.Rt.Newick(true) + ";"
+	return renew
+}
+
+//GetRenamedTreeNCBI innewick with ottids and out newick with ncbiids
+func GetRenamedTreeNCBI(newickin string) Newick {
+	var renew Newick
+	t := ReadNewickString(newickin)
+	var intree Tree
+	intree.Instantiate(t)
+	for _, i := range intree.Post {
+		if len(i.Nam) == 0 {
+			continue
+		}
+		mn := i.Nam
+		if _, ok := ncbiNameMap[mn]; ok {
+			i.Nam = ncbiNameMap[mn]
 		}
 	}
 	renew.NewString = intree.Rt.Newick(true) + ";"

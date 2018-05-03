@@ -38,4 +38,10 @@ var routes = Routes{
 		"/rename_tree",
 		RenameTree,
 	},
+	Route{
+		"RenameTreeNCBI",
+		"POST",
+		"/rename_tree_ncbi",
+		RenameTreeNCBI,
+	},
 }
