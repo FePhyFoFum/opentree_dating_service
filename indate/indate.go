@@ -1,9 +1,10 @@
 package main
 
 import (
-	"inducedates"
 	"log"
 	"net/http"
+
+	"github.com/FePhyFoFum/opentree_dating_service"
 )
 
 func main() {
