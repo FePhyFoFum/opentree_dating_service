@@ -7,14 +7,15 @@ import (
 
 // Node minimal node struct
 type Node struct {
-	Par    *Node   //parent
-	Chs    []*Node //childs
-	Nam    string  //name
-	SData  map[string]string
-	Len    float64 //branch length
-	Data   [][]float64
-	Marked bool //just for like calculations
-	Height float64
+	Par       *Node   //parent
+	Chs       []*Node //childs
+	Nam       string  //name
+	SData     map[string]string
+	Len       float64 //branch length
+	Data      [][]float64
+	Marked    bool //just for like calculations
+	Height    float64
+	MarkedMap map[float64]bool //the float is for an id for the query
 }
 
 // Walk just a simple walker with chans
@@ -83,11 +84,11 @@ func (n Node) Newick(bl bool) (ret string) {
 }
 
 // NewickPaint returns a string newick
-func (n Node) NewickPaint(bl bool) (ret string) {
+func (n Node) NewickPaint(bl bool, rid float64) (ret string) {
 	var buffer bytes.Buffer
 	painted := make([]*Node, 0)
 	for _, cn := range n.Chs {
-		if cn.Marked {
+		if _, ok := cn.MarkedMap[rid]; ok {
 			painted = append(painted, cn)
 		}
 	}
@@ -95,7 +96,7 @@ func (n Node) NewickPaint(bl bool) (ret string) {
 		if in == 0 {
 			buffer.WriteString("(")
 		}
-		buffer.WriteString(cn.NewickPaint(bl))
+		buffer.WriteString(cn.NewickPaint(bl, rid))
 		if bl == true {
 			s := strconv.FormatFloat(cn.Len, 'f', -1, 64)
 			buffer.WriteString(":")
@@ -107,7 +108,7 @@ func (n Node) NewickPaint(bl bool) (ret string) {
 			buffer.WriteString(",")
 		}
 	}
-	if n.Marked {
+	if _, ok := n.MarkedMap[rid]; ok {
 		buffer.WriteString(n.Nam)
 	}
 	ret = buffer.String()

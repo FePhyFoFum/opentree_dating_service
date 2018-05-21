@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var tree Tree
@@ -109,6 +111,8 @@ func init() {
 
 //GetInducedTree make the induced tree and return the newick string
 func GetInducedTree(ids []int) Newick {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	rid := r.Float64()
 	nds := make([]*Node, 0)
 	unmatched := make([]int, 0)
 	for _, i := range ids {
@@ -118,11 +122,11 @@ func GetInducedTree(ids []int) Newick {
 			unmatched = append(unmatched, i)
 		}
 	}
-	traceTree(nds)
+	traceTree(nds, rid)
 	addLen := make(map[string]float64)
 	for _, i := range nds {
 		if len(i.Chs) > 0 {
-			if len(getMarkedChs(i)) == 0 {
+			if len(getMarkedChs(i, rid)) == 0 {
 				addLen[i.Nam] = getSubTendLen(i)
 			}
 		}
@@ -132,7 +136,7 @@ func GetInducedTree(ids []int) Newick {
 	curRt := tree.Rt
 	going := true
 	for going {
-		x := getMarkedChs(curRt)
+		x := getMarkedChs(curRt, rid)
 		if len(x) == 1 {
 			curRt = x[0]
 		} else {
@@ -140,7 +144,7 @@ func GetInducedTree(ids []int) Newick {
 			break
 		}
 	}
-	x := curRt.NewickPaint(true) + ";"
+	x := curRt.NewickPaint(true, rid) + ";"
 	//handle the tips thjat are not tips
 	//this takes time but necessary
 	nt := ReadNewickString(x)
@@ -154,7 +158,7 @@ func GetInducedTree(ids []int) Newick {
 	x = nt.Newick(true) + ";"
 	//end the handle
 	n.NewString = x
-	untraceTree(nds)
+	untraceTree(nds, rid)
 	return n
 }
 
@@ -174,26 +178,26 @@ func getSubTendLen(nd *Node) float64 {
 	return x
 }
 
-func getMarkedChs(nd *Node) []*Node {
+func getMarkedChs(nd *Node, rid float64) []*Node {
 	x := make([]*Node, 0)
 	for _, i := range nd.Chs {
-		if i.Marked {
+		if _, ok := i.MarkedMap[rid]; ok {
 			x = append(x, i)
 		}
 	}
 	return x
 }
 
-func traceTree(nds []*Node) {
+func traceTree(nds []*Node, rid float64) {
 	for _, n := range nds {
-		n.Marked = true
+		n.MarkedMap[rid] = true
 		going := true
 		cur := n.Par
 		for going {
-			if cur.Marked {
+			if _, ok := cur.MarkedMap[rid]; ok {
 				break
 			}
-			cur.Marked = true
+			cur.MarkedMap[rid] = true
 			if cur.Par == nil {
 				break
 			}
@@ -202,16 +206,18 @@ func traceTree(nds []*Node) {
 	}
 }
 
-func untraceTree(nds []*Node) {
+func untraceTree(nds []*Node, rid float64) {
 	for _, n := range nds {
-		n.Marked = false
+		if _, ok := n.MarkedMap[rid]; ok {
+			delete(n.MarkedMap, rid)
+		}
 		going := true
 		cur := n.Par
 		for going {
-			if cur.Marked == false {
+			if _, ok := cur.MarkedMap[rid]; !ok {
 				break
 			}
-			cur.Marked = false
+			delete(cur.MarkedMap, rid)
 			if cur.Par == nil {
 				break
 			}
