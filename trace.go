@@ -14,6 +14,7 @@ import (
 var tree Tree
 var namedNodeMap map[int]*Node
 var ottidNameMap map[string]string
+var gbifOttidMap map[int]int
 var ncbiNameMap map[string]string
 
 // Run at the start of the server
@@ -65,11 +66,34 @@ func init() {
 	defer f.Close()
 	scanner = bufio.NewReader(f)
 	ottidNameMap = make(map[string]string)
+	gbifOttidMap = make(map[int]int)
 	for {
 		ln, err := scanner.ReadString('\n')
 		if len(ln) > 0 {
 			s := strings.Split(ln, "\t|\t")
 			ottidNameMap[s[0]] = prettifyName(s[2])
+			if strings.Contains(s[4], "gbif") {
+				s2 := strings.Split(s[4], ",")
+				var gbifid int
+				for _, x := range s2 {
+					if strings.Contains(x, "gbif") {
+						s3 := strings.Split(x, ":")
+						nv, err := strconv.Atoi(s3[1])
+						if err != nil {
+							fmt.Println(err)
+							os.Exit(0)
+						}
+						gbifid = nv
+						break
+					}
+				}
+				otdid, err := strconv.Atoi(s[0])
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(0)
+				}
+				gbifOttidMap[gbifid] = otdid
+			}
 		}
 		if err == io.EOF {
 			break
@@ -107,6 +131,21 @@ func init() {
 	//end ncbi taxonomy processing
 
 	fmt.Println("finished init")
+}
+
+//GetOttidsFromGbifids gets ott ids from gbif ids
+func GetOttidsFromGbifids(ids []int) OttidResults {
+	var n OttidResults
+	n.Ottids = make([]int, 0)
+	n.Unmatched = make([]int, 0)
+	for _, i := range ids {
+		if _, ok := gbifOttidMap[i]; ok {
+			n.Ottids = append(n.Ottids, gbifOttidMap[i])
+		} else {
+			n.Unmatched = append(n.Unmatched, i)
+		}
+	}
+	return n
 }
 
 //GetInducedTree make the induced tree and return the newick string
