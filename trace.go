@@ -134,13 +134,13 @@ func init() {
 }
 
 //GetOttidsFromGbifids gets ott ids from gbif ids
-func GetOttidsFromGbifids(ids []int) OttidResults {
+func GetOttidsFromGbifids(gbifids []int) OttidResults {
 	var n OttidResults
-	n.Ottids = make([]int, 0)
+	n.GbifOttidMap = make(map[int]int)
 	n.Unmatched = make([]int, 0)
-	for _, i := range ids {
+	for _, i := range gbifids {
 		if _, ok := gbifOttidMap[i]; ok {
-			n.Ottids = append(n.Ottids, gbifOttidMap[i])
+			n.GbifOttidMap[i] = gbifOttidMap[i]
 		} else {
 			n.Unmatched = append(n.Unmatched, i)
 		}

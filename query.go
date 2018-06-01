@@ -12,8 +12,8 @@ type GBIFQuery struct {
 
 // OttidResults for returning ottid results
 type OttidResults struct {
-	Ottids    []int `json:"ott_ids"`
-	Unmatched []int `json:"unmatched_gbif_ids"`
+	GbifOttidMap map[int]int `json:"gbif_ott_id_map"`
+	Unmatched    []int       `json:"unmatched_gbif_ids"`
 }
 
 // Newick return newick string json
