@@ -2,7 +2,6 @@ package inducedates
 
 import (
 	"net/http"
-
 	"github.com/gorilla/mux"
 )
 

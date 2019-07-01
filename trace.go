@@ -19,6 +19,7 @@ var ncbiNameMap map[string]string
 
 // Run at the start of the server
 func init() {
+	//This is hard coded for the time being
 	tfn := "labelled_supertree.dated.tiplen.tre"
 	//read a tree file
 	f, err := os.Open(tfn)
